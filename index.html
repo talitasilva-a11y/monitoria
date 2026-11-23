@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Monitoria de qualidade | Agility Soluções</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/simbolo.png">
+</head>
+<body>
+  <div id="carregando-inicial" class="carregando-inicial">Carregando…</div>
+
+  <div id="tela-login" class="login" hidden>
+    <form id="form-login" class="login-caixa" novalidate>
+      <img class="login-logo" src="img/logo-cor.png" alt="Agility Soluções" width="640" height="210">
+      <h1>Monitoria de qualidade</h1>
+      <label class="campo">Login
+        <input id="l-login" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="nome.sobrenome">
+      </label>
+      <label class="campo">Senha
+        <input id="l-senha" type="password" autocomplete="current-password">
+      </label>
+      <p id="l-erro" class="erro" role="alert"></p>
+      <button class="btn primario largo" type="submit">Entrar</button>
+      <p class="nota-rodape">Esqueceu a senha? Fale com a administradora do sistema.</p>
+    </form>
+  </div>
+
+  <div id="app" class="app" hidden>
+    <nav class="trilho" aria-label="Menu">
+      <div class="trilho-marca"><img src="img/logo-cor-claro.png" alt="Agility Soluções" width="480" height="158"><span>Monitoria de qualidade</span></div>
+      <a href="#inicio" data-rota="inicio">Visão geral</a>
+      <a href="#nova" data-rota="nova">Nova monitoria</a>
+      <a href="#monitorias" data-rota="monitorias">Monitorias</a>
+      <a href="#relatorios" data-rota="relatorios">Relatórios</a>
+      <a href="#config" data-rota="config" id="nav-config" hidden>Configurações</a>
+      <div class="trilho-usuario"><span id="u-nome"></span><button id="btn-sair" class="link" type="button">Sair</button></div>
+    </nav>
+    <main id="conteudo" class="conteudo"></main>
+  </div>
+
+  <dialog id="dialogo" class="dialogo"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

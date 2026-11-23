@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() { return request.auth != null && request.auth.token.email != null; }
+    function email() { return request.auth.token.email.lower(); }
+    function doDominio() { return email().matches('^[a-z0-9._-]+@monitoria[.]agility[.]com[.]br$'); }
+    function login() { return email().split('@')[0]; }
+
+    // Se mudar o login da administradora, mude aqui e em js/config.js
+    function ehAdmin() { return logado() && email() == 'talita.silva@monitoria.agility.com.br'; }
+
+    function ehMonitor() {
+      return logado() && doDominio() && (
+        ehAdmin() ||
+        (exists(/databases/$(database)/documents/usuarios/$(login())) &&
+         get(/databases/$(database)/documents/usuarios/$(login())).data.ativo == true)
+      );
+    }
+    function notaValida() {
+      return request.resource.data.nota is number &&
+             request.resource.data.nota >= 0 && request.resource.data.nota <= 100;
+    }
+
+    match /usuarios/{id}  { allow read: if ehMonitor(); allow write: if ehAdmin(); }
+    match /setores/{id}   { allow read: if ehMonitor(); allow write: if ehAdmin(); }
+    match /agentes/{id}   { allow read: if ehMonitor(); allow write: if ehAdmin(); }
+    match /criterios/{id} { allow read: if ehMonitor(); allow write: if ehAdmin(); }
+
+    match /monitorias/{id} {
+      allow read: if ehMonitor();
+      allow create: if ehAdmin() ||
+        (ehMonitor() && request.resource.data.monitorLogin == login() && notaValida());
+      allow update: if ehAdmin() ||
+        (ehMonitor() && resource.data.monitorLogin == login() &&
+         request.resource.data.monitorLogin == login() && notaValida());
+      allow delete: if ehAdmin() || (ehMonitor() && resource.data.monitorLogin == login());
+    }
+
+    // Qualquer outro caminho: bloqueado.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
