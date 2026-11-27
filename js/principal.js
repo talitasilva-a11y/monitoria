@@ -197,6 +197,7 @@ function respostasNovas(canal) {
 
 function htmlCriterio(r, i) {
   const falhou = U.falhou(r);
+  const temObs = r.resposta === 'SIM' || r.resposta === 'NÃO';
   const fatal = Number(r.peso) >= 100;
   const regra = fatal ? `Zera a nota se ${r.penaliza}` : `Desconta ${r.peso} se ${r.penaliza}`;
   const botoes = [['SIM', 'Sim'], ['NÃO', 'Não'], ['NA', 'N/A']].map(([v, t]) =>
@@ -204,7 +205,7 @@ function htmlCriterio(r, i) {
   return `<div class="criterio${falhou ? ' falhou' : ''}" data-i="${i}">
     <div><span class="crit-nome">${esc(r.nome)}</span><span class="crit-peso${fatal ? ' fatal' : ''}">${regra}</span></div>
     <div class="segmentado resposta" role="group" aria-label="${esc(r.nome)}">${botoes}</div>
-    ${falhou ? `<textarea class="crit-obs" rows="2" placeholder="Observação sobre este item (opcional)">${esc(r.obs || '')}</textarea>` : ''}
+    ${temObs ? `<textarea class="crit-obs" rows="2" placeholder="Observação sobre este item (opcional)">${esc(r.obs || '')}</textarea>` : ''}
   </div>`;
 }
 
@@ -294,7 +295,7 @@ function telaNova(main) {
       const i = +linha.dataset.i;
       f.respostas[i].resposta = bResp.dataset.r;
       linha.outerHTML = htmlCriterio(f.respostas[i], i);
-      if (U.falhou(f.respostas[i])) boxCrit.querySelector(`.criterio[data-i="${i}"] .crit-obs`)?.focus();
+      if (['SIM', 'NÃO'].includes(f.respostas[i].resposta)) boxCrit.querySelector(`.criterio[data-i="${i}"] .crit-obs`)?.focus();
       desenharPlacar();
       return;
     }
@@ -350,7 +351,7 @@ function telaNova(main) {
       return;
     }
     const setor = setorPorId(f.setorId), agente = agentePorId(f.agenteId);
-    const respostas = f.respostas.map(r => ({ ...r, obs: U.falhou(r) ? String(r.obs || '').trim() : '' }));
+    const respostas = f.respostas.map(r => ({ ...r, obs: ['SIM', 'NÃO'].includes(r.resposta) ? String(r.obs || '').trim() : '' }));
     const { desconto, nota } = U.calcularNota(respostas);
     const dados = {
       canal: f.canal,
@@ -494,7 +495,7 @@ function abrirDetalhe(m) {
       <h3>Critérios</h3>
       <ul class="lista-respostas">${(m.respostas || []).map(r => `<li class="${U.falhou(r) ? 'falhou' : ''}">
         <span>${esc(r.nome)}</span><strong>${textoResp(r)}</strong>
-        ${U.falhou(r) && r.obs ? `<span class="obs">${esc(r.obs)}</span>` : ''}</li>`).join('')}</ul>
+        ${r.obs ? `<span class="obs">${esc(r.obs)}</span>` : ''}</li>`).join('')}</ul>
       <h3>Observação final</h3>
       <p class="texto">${esc(m.obsFinal || '—')}</p>
     </div>
